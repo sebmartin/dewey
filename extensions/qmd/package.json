@@ -1,0 +1,29 @@
+{
+  "name": "dewey-qmd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dewey qmd extension: embeds @tobilu/qmd as a library and serves an MCP endpoint scoped to dewey collections.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "dev": "tsx src/main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@tobilu/qmd": "^2.1.0",
+    "chokidar": "^4.0.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.0"
+  }
+}

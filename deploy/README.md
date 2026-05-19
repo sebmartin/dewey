@@ -1,6 +1,7 @@
-# Dewey — Phase 1 deploy
+# Dewey deploy
 
-Boots Caddy (TLS), mcp-proxy (extension aggregator), and dewey (fs tools + commit API).
+Boots Caddy (TLS), mcp-proxy (extension aggregator), dewey (fs tools + commit API),
+and qmd (hybrid search extension).
 
 ## First-time setup
 
@@ -31,7 +32,10 @@ uv run python deploy/smoke.py \
   --insecure          # local self-signed only; drop in prod
 ```
 
-Should print `PASS — Phase 1 stack is healthy`.
+Should print `PASS — stack is healthy`. Add `--with-qmd-search` to also exercise
+qmd end-to-end (writes a test file, forces a reindex, runs a search). First call
+against a fresh `qmd_cache` volume triggers a ~2 GB GGUF model download and can
+take several minutes; afterwards it's fast.
 
 ## Wire into Claude Code
 
@@ -56,4 +60,6 @@ For a local-dev (self-signed) URL you'll need to trust Caddy's local CA — see
 docker compose -f deploy/docker-compose.yml down
 ```
 
-Volumes (`caddy_data`, `caddy_config`) persist by default; add `-v` to remove them.
+Volumes (`caddy_data`, `caddy_config`, `qmd_cache`) persist by default; add `-v`
+to remove them. The qmd_cache holds qmd's sqlite index and downloaded GGUF
+models — wiping it forces a fresh download on next boot.
