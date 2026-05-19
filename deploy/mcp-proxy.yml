@@ -1,0 +1,7 @@
+# TBXark/mcp-proxy server list — one entry per extension.
+# Dewey is the first peer; later phases (qmd, pdf, img, smb) add more entries.
+# Each `url` is reached over the Docker network; no auth needed at this hop.
+
+servers:
+  - name: dewey
+    url: http://dewey:8000/mcp

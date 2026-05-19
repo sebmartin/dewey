@@ -1,0 +1,54 @@
+name: dewey
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - mcp-proxy
+      - dewey
+    restart: unless-stopped
+
+  mcp-proxy:
+    # TBXark/mcp-proxy aggregates extension MCP endpoints behind a single URL.
+    # NOTE: default listen port assumed 9090 — confirm against the image's docs
+    # and update both this file and the Caddyfile if it differs.
+    image: ghcr.io/tbxark/mcp-proxy:latest
+    volumes:
+      - ./mcp-proxy.yml:/config.yml:ro
+    depends_on:
+      - dewey
+    restart: unless-stopped
+
+  dewey:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ${DATA_DIR:?DATA_DIR must be set in .env}:/data
+      - ${TMP_DIR:?TMP_DIR must be set in .env}:/tmp
+    secrets:
+      - dewey_token
+    environment:
+      DATA_ROOT: /data
+      TMP_ROOT: /tmp
+    # Port 8001 is intentionally NOT published — commit API is reachable only
+    # from inside the Docker network (i.e. only legitimate extension containers).
+    expose:
+      - "8000"
+      - "8001"
+    restart: unless-stopped
+
+secrets:
+  dewey_token:
+    file: ../secrets/dewey_token.txt
+
+volumes:
+  caddy_data:
+  caddy_config:

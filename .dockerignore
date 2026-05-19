@@ -1,0 +1,15 @@
+.git
+.gitignore
+.dockerignore
+.venv
+.pytest_cache
+.python-version
+.claude
+__pycache__
+**/__pycache__
+*.pyc
+*.egg-info
+tests/
+deploy/
+secrets/
+*.md

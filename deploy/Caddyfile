@@ -1,0 +1,29 @@
+# Local-dev Caddyfile: self-signed TLS, localhost only.
+#
+# For production, replace the site block with your real hostname and remove
+# the `local_certs` global. Caddy will then provision real ACME certificates
+# automatically. The route configuration stays the same.
+#
+#   your-hostname.example.com {
+#       @mcp path /mcp*
+#       reverse_proxy @mcp mcp-proxy:9090
+#
+#       @authvalidate path /auth/validate
+#       reverse_proxy @authvalidate dewey:8001
+#   }
+
+{
+    local_certs
+}
+
+localhost {
+    # MCP traffic flows through the aggregator so every extension is reachable
+    # from one URL. Bearer-token auth is enforced inside FastMCP/FastAPI.
+    @mcp path /mcp*
+    reverse_proxy @mcp mcp-proxy:9090
+
+    # Token introspection bypasses mcp-proxy — it's a REST endpoint on the
+    # commit API, not MCP. Hits dewey:8001 directly inside the Docker network.
+    @authvalidate path /auth/validate
+    reverse_proxy @authvalidate dewey:8001
+}
