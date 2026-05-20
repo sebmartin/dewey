@@ -1,25 +1,13 @@
 name: dewey
 
 services:
-  caddy:
-    image: caddy:2-alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - mcp-proxy
-      - dewey
-    restart: unless-stopped
-
   mcp-proxy:
     # TBXark/mcp-proxy aggregates extension MCP endpoints behind a single URL.
     # NOTE: default listen port assumed 9090 — confirm against the image's docs
-    # and update both this file and the Caddyfile if it differs.
+    # and update both this file and mcp-proxy.yml if it differs.
     image: ghcr.io/tbxark/mcp-proxy:latest
+    ports:
+      - "9090:9090"
     volumes:
       - ./mcp-proxy.yml:/config.yml:ro
     depends_on:
@@ -48,7 +36,3 @@ services:
 secrets:
   dewey_token:
     file: ../secrets/dewey_token.txt
-
-volumes:
-  caddy_data:
-  caddy_config:
