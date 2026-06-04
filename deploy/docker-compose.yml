@@ -12,6 +12,7 @@ services:
       - ./mcp-proxy.yml:/config.yml:ro
     depends_on:
       - dewey
+      - qmd
     restart: unless-stopped
 
   dewey:
@@ -33,6 +34,27 @@ services:
       - "8001"
     restart: unless-stopped
 
+  qmd:
+    # First extension. Embeds @tobilu/qmd as a library and exposes the
+    # five qmd_* MCP tools, scoped to dewey collections by a chokidar
+    # watcher over /data. /data is bind-mounted read-only — qmd is a
+    # transform extension that never writes back through this path.
+    build:
+      context: ../extensions/qmd
+      dockerfile: Dockerfile
+    volumes:
+      - ${DATA_DIR:?DATA_DIR must be set in .env}:/data:ro
+      - qmd_cache:/cache
+    environment:
+      DATA_ROOT: /data
+      QMD_CACHE_DIR: /cache
+    expose:
+      - "8181"
+    restart: unless-stopped
+
 secrets:
   dewey_token:
     file: ../secrets/dewey_token.txt
+
+volumes:
+  qmd_cache:
